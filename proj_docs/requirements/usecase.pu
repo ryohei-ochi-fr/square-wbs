@@ -1,0 +1,41 @@
+
+@startuml
+
+title ユースケース図
+left to right direction
+actor "作業者" as worker
+actor "TL" as tl
+actor "PM" as pm
+rectangle "WBS"{
+    package "工程管理" {
+        usecase "タスクの計画" as task_list
+        usecase "タスクの繋がり" as task_link
+        usecase "タスクの進捗" as task_progress
+    }
+    package "タスク管理" {
+        usecase "タスクの把握" as task_remaining
+        usecase "予定日入力" as task_plan
+        usecase "実績日入力" as task_achieve
+    }
+    package "文書管理" {
+        usecase "Excel形式入力" as excel_imp
+        usecase "Excel形式出力" as excel_exp
+    }
+}
+pm ---> excel_imp
+pm ---> excel_exp
+
+pm -----> task_list
+pm -----> task_link
+pm <----- task_progress
+tl -----> task_link
+tl -----> task_progress
+
+pm <----> task_plan
+tl -----> task_plan
+tl -----> task_remaining
+
+worker -----> task_remaining
+worker -----> task_achieve
+
+@enduml
