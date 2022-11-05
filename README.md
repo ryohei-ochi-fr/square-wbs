@@ -5,8 +5,14 @@
 ### Angular
 
 ```shell
-mkdir front
-cd front
-npm install @angular/cli
-```
+npm install -g @angular/cli
 
+ng new front
+
+cd front
+ng serve --open
+
+# ブラウザがopenする
+http://localhost:4200/
+
+```
