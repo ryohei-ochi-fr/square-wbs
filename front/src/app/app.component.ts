@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from "@angular/core";
+import * as jspreadsheet from "jspreadsheet-ce";
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,19 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  @ViewChild("spreadsheet")
+  spreadsheet!: ElementRef;
+
   title = 'SquareWBS';
+
+  ngAfterViewInit() {
+    jspreadsheet(this.spreadsheet.nativeElement, {
+      data: [[]],
+      columns: [
+        { type: "dropdown", width: 100, source: ["Y", "N"] },
+        { type: "color", width: 100, render: "square" }
+      ],
+      minDimensions: [10, 10]
+    });
+  }
 }
