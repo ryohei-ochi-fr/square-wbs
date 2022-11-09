@@ -14,10 +14,13 @@ export class AppComponent {
 
   ngAfterViewInit() {
     jspreadsheet(this.spreadsheet.nativeElement, {
-      data: [[]],
+      url: "assets/data.json",
       columns: [
-        { type: "dropdown", width: 100, source: ["Y", "N"] },
-        { type: "color", width: 100, render: "square" }
+        { title:'タスク名', width:300, align: 'left' },
+        { title:'担当者', width:80 },
+        { title:'開始日', width:80 },
+        { title:'終了日', width:80 },
+        { title:'進捗率', width:80, type: 'text', },
       ],
       minDimensions: [10, 10]
     });
