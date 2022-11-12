@@ -11,19 +11,31 @@ export class AppComponent {
   spreadsheet!: ElementRef;
 
   title = 'SquareWBS';
+  log = '';
 
   ngAfterViewInit() {
+
+    this.log = '';
+    const selectionActive = function (instance: HTMLElement, x1: number, y1: number, x2: number, y2: number) {
+      var cellName1 = jspreadsheet.getColumnNameFromId([x1, y1]);
+      var cellName2 = jspreadsheet.getColumnNameFromId([x2, y2]);
+      console.log('The selection from ' + cellName1 + ' to ' + cellName2 + '');
+    }
+
     jspreadsheet(this.spreadsheet.nativeElement, {
       url: "assets/data.json",
       columns: [
-        { title:'タスク名', width:300, align: 'left' },
-        { title:'担当者', width:80 },
-        { title:'開始日', width:80 },
-        { title:'終了日', width:80 },
-        { title:'進捗率', width:80, type: 'text', },
+        { title: 'タスク名', width: 300, align: 'left' },
+        { title: '担当者', width: 80 },
+        { title: '開始日', width: 80 },
+        { title: '終了日', width: 80 },
+        { title: '進捗率', width: 80, type: 'text', },
       ],
-      minDimensions: [10, 10]
+      minDimensions: [10, 10],
+      onselection: selectionActive,
     });
+
+
 
     // 外部のjsを読み込む場合
     const script = document.createElement('script');
@@ -31,7 +43,7 @@ export class AppComponent {
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js';
 
     const div = document.getElementById('script');
-    if (div != null){
+    if (div != null) {
       div.insertAdjacentElement('afterend', script);
     }
 

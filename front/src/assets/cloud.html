@@ -1,0 +1,38 @@
+<html>
+<script src="https://jspreadsheet.com/v9/jspreadsheet.js"></script>
+<link rel="stylesheet" href="https://jspreadsheet.com/v9/jspreadsheet.css" type="text/css" />
+<script src="https://jsuites.net/v4/jsuites.js"></script>
+<link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+ 
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons" />
+ 
+<script src="https://cdn.jsdelivr.net/npm/@jspreadsheet/cloud/dist/index.min.js"></script>
+ 
+<div id="spreadsheet"></div>
+ 
+<script>
+// Set the license for both plugin and the spreadsheet
+jspreadsheet.setLicense('Yzg4ZmMwNTFjNTc2NzY4ODQ2OGJiZWEzMGYyNTc5YzAzYTcxNDliMTM0NTJiODE1OTcyNzhkMTY4YmRjMmM1MmMyZjg0YWRlYTRhYjQ5MzU4ZmM5ZGY4MGNlOTMzNjRlMzMwZTRlODZiNTIyYTY1M2JiZDI3MWYxZWYxNWQ0N2QsZXlKdVlXMWxJam9pU25Od2NtVmhaSE5vWldWMElpd2laR0YwWlNJNk1UWTJPRE16TnpVNE5Dd2laRzl0WVdsdUlqcGJJbXB6Y0hKbFlXUnphR1ZsZEM1amIyMGlMQ0pqYjJSbGMyRnVaR0p2ZUM1cGJ5SXNJbXB6YUdWc2JDNXVaWFFpTENKamMySXVZWEJ3SWl3aWJHOWpZV3hvYjNOMElsMHNJbkJzWVc0aU9pSXpJaXdpYzJOdmNHVWlPbHNpZGpjaUxDSjJPQ0lzSW5ZNUlpd2lZMmhoY25Seklpd2labTl5YlhNaUxDSm1iM0p0ZFd4aElpd2ljR0Z5YzJWeUlpd2ljbVZ1WkdWeUlpd2lZMjl0YldWdWRITWlMQ0pwYlhCdmNuUWlMQ0ppWVhJaUxDSjJZV3hwWkdGMGFXOXVjeUlzSW5ObFlYSmphQ0pkTENKa1pXMXZJanAwY25WbGZRPT0=');
+ 
+// Set the extensions
+jspreadsheet.setExtensions({ cloud });
+ 
+// Cloud configuration
+jspreadsheet.cloud({
+    // URL to the JSS server
+    url: 'https://jspreadsheet.com/',
+    // Token signature
+    token: 'MSxiYjBlNzlmYWYzNTBiY2UzYmFjYTljZGIzN2QyOGI3N2Q0YWQzOWI0',
+    // Before sending ajax requests to the server
+    onbeforesend: function(options) {
+        console.log(options)
+    }
+});
+ 
+// Create the spreadsheet
+jspreadsheet(document.getElementById('spreadsheet'), {
+    cloud: '844491c0-787a-4c7e-a43b-7e12035e7fc4',
+});
+ 
+</script>
+</html>
