@@ -25,4 +25,9 @@ export class EventsGateway {
     console.log('msg:', data);
     return { event: 'message', data: data };
   }
+
+  @SubscribeMessage('broadcast')
+  broadcast(@MessageBody() data: any): void {
+    this.server.emit('broadcast', 'server response');
+  }
 }

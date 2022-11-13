@@ -27,7 +27,7 @@ export class AppComponent implements OnInit, OnDestroy {
   response: any;
   msg: message = {
     socketId: 'aaa',
-    username: 'bbb',
+    username: 'unicast',
     cellx: 1,
     celly: 1,
   };
@@ -39,11 +39,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.webSocketService.connect();
-    this.connection = this.webSocketService.on('message').subscribe(data => {
+    this.connection = this.webSocketService.on('broadcast').subscribe(data => {
       console.log(data);
       this.response = data;
     })
-    this.webSocketService.emit('message', this.msg);
+    // this.webSocketService.emit('message', this.msg);
   }
 
   ngOnDestroy(): void {
@@ -57,9 +57,17 @@ export class AppComponent implements OnInit, OnDestroy {
       cellx: x1,
       celly: y1,
     }
+    // サーバへ送信する
     this.webSocketService.emit('message', this.msg);
-    console.log('click start');
-    console.log('click end')
+    
+    const msg2: message = {
+      socketId: 'aaa',
+      username: 'broadcast',
+      cellx: 9,
+      celly: 9,
+    };
+    // サーバへ送信した後にレスポンスをブロードキャストで受け取る
+    this.webSocketService.emit('broadcast', msg2);
 
   }
 

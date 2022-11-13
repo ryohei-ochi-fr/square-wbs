@@ -3,6 +3,23 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch via npm",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "start:debug"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "sourceMaps": true,
+            "envFile": "${workspaceFolder}/.env",
+            "cwd": "${workspaceRoot}/back/",
+            "console": "integratedTerminal",
+        },
+        {
             "name": "Launch Chrome",
             "type": "chrome",
             "request": "launch",
