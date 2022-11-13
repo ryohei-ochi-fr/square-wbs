@@ -1,20 +1,63 @@
-import { Component, ViewChild, ElementRef } from "@angular/core";
+import { Component, ViewChild, ElementRef, OnInit, OnDestroy } from "@angular/core";
 import * as jspreadsheet from "jspreadsheet-ce";
+// import io from 'socket.io-client';
+import { io } from "socket.io-client";
+import { WebsocketService } from './websocket.service';
+
+interface message {
+  socketId: string
+  username: string
+  cellx: number
+  celly: number
+}
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   @ViewChild("spreadsheet")
   spreadsheet!: ElementRef;
+
+  // フロントがangular
+  // [NestJSでWebSocket - Qiita](https://qiita.com/YutaSaito1991/items/26d25ae6ccf89fb25115)
+
+  connection: any;
+  response: any;
+  msg: message = {
+    socketId: 'aaa',
+    username: 'bbb',
+    cellx: 1,
+    celly: 1,
+  };
+
+  constructor( private webSocketService: WebsocketService ){}
 
   title = 'SquareWBS';
   log = '';
 
-  ngAfterViewInit() {
+  ngOnInit(): void {
+    this.webSocketService.connect();
+    this.connection = this.webSocketService.on('message').subscribe(data => {
+      console.log(data);
+      this.response = data;
+    })
+    this.webSocketService.emit('message', this.msg);
+  }
 
+  ngOnDestroy(): void {
+    this.connection.unsubscribe();
+  }
+
+  onClick(){
+    this.webSocketService.emit('events', this.msg);
+    console.log('click start');
+    console.log('click end')
+
+  }
+
+  ngAfterViewInit() {
     this.log = '';
     const selectionActive = function (instance: HTMLElement, x1: number, y1: number, x2: number, y2: number) {
       var cellName1 = jspreadsheet.getColumnNameFromId([x1, y1]);
