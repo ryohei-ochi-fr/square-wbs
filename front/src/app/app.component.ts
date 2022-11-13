@@ -43,7 +43,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.webSocketService.connect();
     this.connection = this.webSocketService.on('broadcast').subscribe(data => {
       console.log('broadcast', data);
-      this.response = data;
     })
     this.connection = this.webSocketService.on('message').subscribe(data => {
       console.log('message', data);
@@ -53,7 +52,6 @@ export class AppComponent implements OnInit, OnDestroy {
       const cell = `${x}${y}`;
 
       this.w.setStyle(cell,'border','solid 1px orange');
-
     })
     // this.webSocketService.emit('message', this.msg);
   }
@@ -79,7 +77,7 @@ export class AppComponent implements OnInit, OnDestroy {
       celly: 9,
     };
     // サーバへ送信した後にレスポンスをブロードキャストで受け取る
-    this.webSocketService.emit('broadcast', msg2);
+    // this.webSocketService.emit('broadcast', msg2);
 
     // this.w.setComments('B2','aaaa','');
     // this.w.setStyle('B1','background-color','yellow');

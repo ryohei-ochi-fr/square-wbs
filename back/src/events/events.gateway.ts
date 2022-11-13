@@ -36,10 +36,10 @@ export class EventsGateway {
     client.join(this.roomId);
     console.log('msg:', data);
     console.log('client:', client.id);
-    console.log('debug:', this.server.adapter);
-    // console.log('debug:', );
-    this.server.to(this.roomId).emit('message', 'peer');
-    return { event: 'message', data: data };
+    // console.log('debug:', this.server.adapter);
+    this.server.to(this.roomId).emit('message', data);
+    // return { event: 'message', data: data };
+    return;
   }
 
   @SubscribeMessage('broadcast')
