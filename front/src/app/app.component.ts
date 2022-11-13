@@ -19,6 +19,8 @@ interface message {
 export class AppComponent implements OnInit, OnDestroy {
   @ViewChild("spreadsheet")
   spreadsheet!: ElementRef;
+  w!: jspreadsheet.JSpreadsheetElement;
+  //w: any;
 
   // フロントがangular
   // [NestJSでWebSocket - Qiita](https://qiita.com/YutaSaito1991/items/26d25ae6ccf89fb25115)
@@ -32,7 +34,7 @@ export class AppComponent implements OnInit, OnDestroy {
     celly: 1,
   };
 
-  constructor( private webSocketService: WebsocketService ){}
+  constructor(private webSocketService: WebsocketService) { }
 
   title = 'SquareWBS';
   log = '';
@@ -40,7 +42,11 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.webSocketService.connect();
     this.connection = this.webSocketService.on('broadcast').subscribe(data => {
-      console.log(data);
+      console.log('broadcast', data);
+      this.response = data;
+    })
+    this.connection = this.webSocketService.on('message').subscribe(data => {
+      console.log('message', data);
       this.response = data;
     })
     // this.webSocketService.emit('message', this.msg);
@@ -50,7 +56,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.connection.unsubscribe();
   }
 
-  send(x1: number, y1: number){
+  send(x1: number, y1: number) {
     this.msg = {
       socketId: '',
       username: '',
@@ -59,7 +65,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     // サーバへ送信する
     this.webSocketService.emit('message', this.msg);
-    
+
     const msg2: message = {
       socketId: 'aaa',
       username: 'broadcast',
@@ -69,19 +75,30 @@ export class AppComponent implements OnInit, OnDestroy {
     // サーバへ送信した後にレスポンスをブロードキャストで受け取る
     this.webSocketService.emit('broadcast', msg2);
 
+    // this.w[0].set
+    //   style: { B1: 'border: solid 1px orange;' },
+    // };
+
+    // this.w.setStyle('B1','border','solid 1px orange;');
+    // this.spreadsheet.nativeElement.setStyle('B1','border','solid 1px orange;');
+    this.w.setComments('B2','aaaa','');
+    this.w.setStyle('B1','background-color','yellow');
+    this.w.setStyle('C1','border','solid 1px orange');
+
+
   }
 
   ngAfterViewInit() {
     this.log = '';
-    const selectionActive =  (instance: HTMLElement, x1: number, y1: number, x2: number, y2: number) => {
+    const selectionActive = (instance: HTMLElement, x1: number, y1: number, x2: number, y2: number) => {
       var cellName1 = jspreadsheet.getColumnNameFromId([x1, y1]);
       var cellName2 = jspreadsheet.getColumnNameFromId([x2, y2]);
       console.log('The selection from ' + cellName1 + ' to ' + cellName2 + '');
 
-      this.send(x1,y1);
+      this.send(x1, y1);
     }
 
-    jspreadsheet(this.spreadsheet.nativeElement, {
+    this.w = jspreadsheet(this.spreadsheet.nativeElement, {
       url: "assets/data.json",
       columns: [
         { title: 'タスク名', width: 300, align: 'left' },
@@ -90,6 +107,8 @@ export class AppComponent implements OnInit, OnDestroy {
         { title: '終了日', width: 80 },
         { title: '進捗率', width: 80, type: 'text', },
       ],
+      style: 
+        { A1: 'border: solid 1px orange;' },
       minDimensions: [10, 10],
       onselection: selectionActive,
     });

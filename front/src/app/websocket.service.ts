@@ -17,6 +17,7 @@ interface message {
 export class WebsocketService {
 
   private backUrl = 'http://localhost:3333';
+  private roomId = 'debug-room';
   private socket: any;
 
   connect() {
