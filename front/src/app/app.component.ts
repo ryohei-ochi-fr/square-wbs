@@ -48,6 +48,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.connection = this.webSocketService.on('message').subscribe(data => {
       console.log('message', data);
       this.response = data;
+      const y:number = this.response.celly + 1;
+      const x:string = String.fromCharCode(65 + this.response.cellx)
+      const cell = `${x}${y}`;
+
+      this.w.setStyle(cell,'border','solid 1px orange');
+
     })
     // this.webSocketService.emit('message', this.msg);
   }
@@ -75,15 +81,9 @@ export class AppComponent implements OnInit, OnDestroy {
     // サーバへ送信した後にレスポンスをブロードキャストで受け取る
     this.webSocketService.emit('broadcast', msg2);
 
-    // this.w[0].set
-    //   style: { B1: 'border: solid 1px orange;' },
-    // };
-
-    // this.w.setStyle('B1','border','solid 1px orange;');
-    // this.spreadsheet.nativeElement.setStyle('B1','border','solid 1px orange;');
-    this.w.setComments('B2','aaaa','');
-    this.w.setStyle('B1','background-color','yellow');
-    this.w.setStyle('C1','border','solid 1px orange');
+    // this.w.setComments('B2','aaaa','');
+    // this.w.setStyle('B1','background-color','yellow');
+    // this.w.setStyle('C1','border','solid 1px orange');
 
 
   }
@@ -107,8 +107,6 @@ export class AppComponent implements OnInit, OnDestroy {
         { title: '終了日', width: 80 },
         { title: '進捗率', width: 80, type: 'text', },
       ],
-      style: 
-        { A1: 'border: solid 1px orange;' },
       minDimensions: [10, 10],
       onselection: selectionActive,
     });
