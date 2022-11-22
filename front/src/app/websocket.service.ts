@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
 interface message {
   socketId: string
   roomId: string
-  username: string
+  userName: string
+  userColor: string
   cellX: number
   cellY: number
   cellXBefore: number

@@ -5,7 +5,8 @@ import { WebsocketService } from './websocket.service';
 interface message {
   socketId: string
   roomId: string
-  username: string
+  userName: string
+  userColor: string
   cellX: number
   cellY: number
   cellXBefore: number
@@ -31,7 +32,8 @@ export class AppComponent implements OnInit, OnDestroy {
   msg: message = {
     socketId: '',
     roomId: '',
-    username: '',
+    userName: '',
+    userColor: '',
     cellX: 0,
     cellY: 0,
     cellXBefore: 0,
@@ -42,13 +44,20 @@ export class AppComponent implements OnInit, OnDestroy {
 
   title = 'SquareWBS';
   log = '';
+
+  // ランダムカラー
   color = Math.floor(Math.random()*16777215).toString(16);
 
+  // todo パレットから選択
+
+  
   ngOnInit(): void {
     this.webSocketService.connect();
+    // socketでブロードキャストを受け取った場合
     this.connection = this.webSocketService.on('broadcast').subscribe(data => {
       console.log('broadcast', data);
     })
+    // socketでメッセージを受け取った場合
     this.connection = this.webSocketService.on('message').subscribe(data => {
       console.log('message', data);
       this.response = data;
@@ -56,7 +65,7 @@ export class AppComponent implements OnInit, OnDestroy {
       const x: string = String.fromCharCode(65 + this.response.cellX)
       const cell = `${x}${y}`;
 
-      this.w.setStyle(cell, 'border', 'solid 1px #'+this.color );
+      this.w.setStyle(cell, 'border', 'solid 1px #'+this.response.userColor);
     })
     // this.webSocketService.emit('message', this.msg);
   }
@@ -69,7 +78,7 @@ export class AppComponent implements OnInit, OnDestroy {
   send() {
     //   this.msg = {
     //   socketId: '',
-    //   username: '',
+    //   userName: '',
     //   roomId: 'debug_room',
     //   cellX: x1,
     //   cellY: y1,
@@ -84,7 +93,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // const msg2: message = {
     //   socketId: 'aaa',
-    //   username: '',
+    //   userName: '',
     //   roomId: 'debug_room',
     //   cellX: 9,
     //   cellY: 9,
@@ -110,7 +119,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
       this.msg = {
         socketId: '',
-        username: this.color,
+        userName: '',
+        userColor: this.color,
         roomId: 'debug_room',
         cellX: x1,
         cellY: y1,
