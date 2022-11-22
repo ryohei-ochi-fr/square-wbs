@@ -1,14 +1,15 @@
 import { Component, ViewChild, ElementRef, OnInit, OnDestroy } from "@angular/core";
 import * as jspreadsheet from "jspreadsheet-ce";
-// import io from 'socket.io-client';
-import { io } from "socket.io-client";
 import { WebsocketService } from './websocket.service';
 
 interface message {
   socketId: string
+  roomId: string
   username: string
-  cellx: number
-  celly: number
+  cellX: number
+  cellY: number
+  cellXBefore: number
+  cellYBefore: number
 }
 
 @Component({
@@ -28,16 +29,20 @@ export class AppComponent implements OnInit, OnDestroy {
   connection: any;
   response: any;
   msg: message = {
-    socketId: 'aaa',
-    username: 'unicast',
-    cellx: 1,
-    celly: 1,
+    socketId: '',
+    roomId: '',
+    username: '',
+    cellX: 0,
+    cellY: 0,
+    cellXBefore: 0,
+    cellYBefore: 0,
   };
 
   constructor(private webSocketService: WebsocketService) { }
 
   title = 'SquareWBS';
   log = '';
+  color = Math.floor(Math.random()*16777215).toString(16);
 
   ngOnInit(): void {
     this.webSocketService.connect();
@@ -47,11 +52,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.connection = this.webSocketService.on('message').subscribe(data => {
       console.log('message', data);
       this.response = data;
-      const y:number = this.response.celly + 1;
-      const x:string = String.fromCharCode(65 + this.response.cellx)
+      const y: number = this.response.cellY + 1;
+      const x: string = String.fromCharCode(65 + this.response.cellX)
       const cell = `${x}${y}`;
 
-      this.w.setStyle(cell,'border','solid 1px orange');
+      this.w.setStyle(cell, 'border', 'solid 1px #'+this.color );
     })
     // this.webSocketService.emit('message', this.msg);
   }
@@ -60,22 +65,32 @@ export class AppComponent implements OnInit, OnDestroy {
     this.connection.unsubscribe();
   }
 
-  send(x1: number, y1: number) {
-    this.msg = {
-      socketId: '',
-      username: '',
-      cellx: x1,
-      celly: y1,
-    }
+  // send(x1: number, y1: number, x2: number, y2: number) {
+  send() {
+    //   this.msg = {
+    //   socketId: '',
+    //   username: '',
+    //   roomId: 'debug_room',
+    //   cellX: x1,
+    //   cellY: y1,
+    //   cellXBefore: x2,
+    //   cellYBefore: y2,
+    // }
     // サーバへ送信する
     this.webSocketService.emit('message', this.msg);
 
-    const msg2: message = {
-      socketId: 'aaa',
-      username: 'broadcast',
-      cellx: 9,
-      celly: 9,
-    };
+    // サーバへ送信した後にレスポンスをブロードキャストで受け取る
+    // this.webSocketService.emit('broadcast', this.msg);
+
+    // const msg2: message = {
+    //   socketId: 'aaa',
+    //   username: '',
+    //   roomId: 'debug_room',
+    //   cellX: 9,
+    //   cellY: 9,
+    //   cellXBefore: 9,
+    //   cellYBefore: 9,
+    // };
     // サーバへ送信した後にレスポンスをブロードキャストで受け取る
     // this.webSocketService.emit('broadcast', msg2);
 
@@ -93,7 +108,18 @@ export class AppComponent implements OnInit, OnDestroy {
       var cellName2 = jspreadsheet.getColumnNameFromId([x2, y2]);
       console.log('The selection from ' + cellName1 + ' to ' + cellName2 + '');
 
-      this.send(x1, y1);
+      this.msg = {
+        socketId: '',
+        username: this.color,
+        roomId: 'debug_room',
+        cellX: x1,
+        cellY: y1,
+        cellXBefore: x2,
+        cellYBefore: y2,
+      }
+
+      // this.send(x1, y1, x1, y1);
+      this.send();
     }
 
     this.w = jspreadsheet(this.spreadsheet.nativeElement, {

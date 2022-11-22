@@ -5,9 +5,12 @@ import { Observable } from 'rxjs';
 
 interface message {
   socketId: string
+  roomId: string
   username: string
-  cellx: number
-  celly: number
+  cellX: number
+  cellY: number
+  cellXBefore: number
+  cellYBefore: number
 }
 
 

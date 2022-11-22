@@ -20,7 +20,7 @@ import { Server, Socket } from 'socket.io';
 export class EventsGateway {
   @WebSocketServer()
   server: Server;
-  private roomId = 'debug-room';
+  private roomId = 'debug_room';
 
   // @SubscribeMessage('message')
   // handleMessage(@MessageBody() data: any): WsResponse<string> {
