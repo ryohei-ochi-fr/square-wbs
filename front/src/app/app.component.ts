@@ -29,6 +29,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   connection: any;
   response: any;
+  cellXBefore: number = 0;
+  cellYBefore: number = 0;
   msg: message = {
     socketId: '',
     roomId: '',
@@ -50,7 +52,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // todo パレットから選択
 
-  
+
   ngOnInit(): void {
     this.webSocketService.connect();
     // socketでブロードキャストを受け取った場合
@@ -61,11 +63,23 @@ export class AppComponent implements OnInit, OnDestroy {
     this.connection = this.webSocketService.on('message').subscribe(data => {
       console.log('message', data);
       this.response = data;
-      const y: number = this.response.cellY + 1;
-      const x: string = String.fromCharCode(65 + this.response.cellX)
-      const cell = `${x}${y}`;
 
+      // セルを描画
+      let y: number = this.response.cellY + 1;
+      let x: string = String.fromCharCode(65 + this.response.cellX)
+      let cell = `${x}${y}`;
       this.w.setStyle(cell, 'border', 'solid 1px #'+this.response.userColor);
+
+      // セルを描画
+      y = this.response.cellYBefore + 1;
+      x = String.fromCharCode(65 + this.response.cellXBefore)
+      cell = `${x}${y}`;
+      // todo スタイルのリセット方法を調査
+      this.w.setStyle(cell, 'border-top', 'solid 1px #ccc');
+      this.w.setStyle(cell, 'border-left', 'solid 1px #ccc');
+      this.w.setStyle(cell, 'border-right', 'solid 1px transparent');
+      this.w.setStyle(cell, 'border-bottom', 'solid 1px transparent');
+
     })
     // this.webSocketService.emit('message', this.msg);
   }
@@ -117,6 +131,8 @@ export class AppComponent implements OnInit, OnDestroy {
       var cellName2 = jspreadsheet.getColumnNameFromId([x2, y2]);
       console.log('The selection from ' + cellName1 + ' to ' + cellName2 + '');
 
+      // todo 範囲選択の処理
+
       this.msg = {
         socketId: '',
         userName: '',
@@ -124,9 +140,12 @@ export class AppComponent implements OnInit, OnDestroy {
         roomId: 'debug_room',
         cellX: x1,
         cellY: y1,
-        cellXBefore: x2,
-        cellYBefore: y2,
+        cellXBefore: this.cellXBefore,
+        cellYBefore: this.cellYBefore,
       }
+
+      this.cellXBefore = x1;
+      this.cellYBefore = y1;
 
       // this.send(x1, y1, x1, y1);
       this.send();
