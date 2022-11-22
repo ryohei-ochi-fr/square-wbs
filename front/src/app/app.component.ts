@@ -64,13 +64,15 @@ export class AppComponent implements OnInit, OnDestroy {
       console.log('message', data);
       this.response = data;
 
+      // todo お互いのセルが重なった場合の排他処理
+
       // セルを描画
       let y: number = this.response.cellY + 1;
       let x: string = String.fromCharCode(65 + this.response.cellX)
       let cell = `${x}${y}`;
       this.w.setStyle(cell, 'border', 'solid 1px #'+this.response.userColor);
 
-      // セルを描画
+      // 直前セルの描画をリセット
       y = this.response.cellYBefore + 1;
       x = String.fromCharCode(65 + this.response.cellXBefore)
       cell = `${x}${y}`;
@@ -160,6 +162,75 @@ export class AppComponent implements OnInit, OnDestroy {
         { title: '終了日', width: 80 },
         { title: '進捗率', width: 80, type: 'text', },
       ],
+      toolbar:[
+/*
+        {
+            type: 'i',
+            content: 'undo',
+            onclick: function() {
+              this.w.undo();
+            }
+        },
+        {
+            type: 'i',
+            content: 'redo',
+            onclick: function() {
+                table.redo();
+            }
+        },
+        {
+            type: 'i',
+            content: 'save',
+            onclick: function () {
+                table.download();
+            }
+        },
+*/
+        {
+            type: 'select',
+            k: 'font-family',
+            v: ['Arial','Verdana']
+        },
+        {
+            type: 'select',
+            k: 'font-size',
+            v: ['9px','10px','11px','12px','13px','14px','15px','16px','17px','18px','19px','20px']
+        },
+        {
+            type: 'i',
+            content: 'format_align_left',
+            k: 'text-align',
+            v: 'left'
+        },
+        {
+            type:'i',
+            content:'format_align_center',
+            k:'text-align',
+            v:'center'
+        },
+        {
+            type: 'i',
+            content: 'format_align_right', 
+            k: 'text-align',
+            v: 'right'
+        },
+        {
+            type: 'i',
+            content: 'format_bold',
+            k: 'font-weight',
+            v: 'bold'
+        },
+        {
+            type: 'color',
+            content: 'format_color_text',
+            k: 'color'
+        },
+        {
+            type: 'color',
+            content: 'format_color_fill',
+            k: 'background-color'
+        },
+    ],
       minDimensions: [10, 10],
       onselection: selectionActive,
     });
