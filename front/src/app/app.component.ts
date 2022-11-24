@@ -1,6 +1,7 @@
 import { Component, ViewChild, ElementRef, OnInit, OnDestroy } from "@angular/core";
 import * as jspreadsheet from "jspreadsheet-ce";
 import { WebsocketService } from './websocket.service';
+import { read, utils, writeFileXLSX } from 'xlsx-js-style';
 
 interface message {
   socketId: string
@@ -13,12 +14,16 @@ interface message {
   cellYBefore: number
 }
 
+interface President { Name: string; Index: number };
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit, OnDestroy {
+  rows: President[] = [{ Name: "SheetJS", Index: 0 }];
+
   @ViewChild("spreadsheet")
   spreadsheet!: ElementRef;
   w!: jspreadsheet.JSpreadsheetElement;
@@ -48,12 +53,12 @@ export class AppComponent implements OnInit, OnDestroy {
   log = '';
 
   // ランダムカラー
-  color = Math.floor(Math.random()*16777215).toString(16);
+  color = Math.floor(Math.random() * 16777215).toString(16);
 
   // todo パレットから選択
 
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.webSocketService.connect();
     // socketでブロードキャストを受け取った場合
     this.connection = this.webSocketService.on('broadcast').subscribe(data => {
@@ -70,7 +75,7 @@ export class AppComponent implements OnInit, OnDestroy {
       let y: number = this.response.cellY + 1;
       let x: string = String.fromCharCode(65 + this.response.cellX)
       let cell = `${x}${y}`;
-      this.w.setStyle(cell, 'border', 'solid 1px #'+this.response.userColor);
+      this.w.setStyle(cell, 'border', 'solid 1px #' + this.response.userColor);
 
       // 直前セルの描画をリセット
       y = this.response.cellYBefore + 1;
@@ -84,6 +89,23 @@ export class AppComponent implements OnInit, OnDestroy {
 
     })
     // this.webSocketService.emit('message', this.msg);
+
+    /* Download from https://sheetjs.com/pres.numbers */
+    // const f = await fetch("https://sheetjs.com/pres.numbers");
+    // const f = await fetch('assets/data.json');
+    // const f = await fetch('assets/sample_001.xlsx');
+    // const f = await fetch('assets/sample_002.xlsx');
+    const f = await fetch('assets/sample_003.xlsx');
+    const ab = await f.arrayBuffer();
+
+    /* parse workbook */
+    const wb = read(ab);
+
+    /* update data */
+    this.rows = utils.sheet_to_json<President>(wb.Sheets[wb.SheetNames[0]]);
+
+    console.log('loaded xlsx');
+    
   }
 
   ngOnDestroy(): void {
@@ -126,6 +148,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
   }
 
+  /* get state data and export to XLSX */
+  onSave(): void {
+    const ws = utils.json_to_sheet(this.rows);
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, "Data");
+    writeFileXLSX(wb, "SheetJSAngularAoO.xlsx");
+  }
+
   ngAfterViewInit() {
     this.log = '';
     const selectionActive = (instance: HTMLElement, x1: number, y1: number, x2: number, y2: number) => {
@@ -153,8 +183,37 @@ export class AppComponent implements OnInit, OnDestroy {
       this.send();
     }
 
+    // xlsx-js-style(SheetJS)を使ってxlsx形式のファイルを読み込む
+    // https://github.com/gitbrent/xlsx-js-style/blob/master/demos/node/demo.js
+    console.log(`\n\n--------------------==~==~==~==[ STARTING DEMO... ]==~==~==~==--------------------\n`);
+    // console.log("`XLSX.version` ......... = " + XLSX.version);
+    // console.log("`XLSX.style_version` ... = " + XLSX.style_version);
+
+    // STEP 1: Create a new Workbook
+    const wb = utils.book_new();
+
+    // STEP 2: Create data rows
+    let row1 = ["a", "b", "c"];
+    let row2 = [1, 2, 3];
+    let row3 = [
+      { v: "Courier: 24", t: "s", s: { font: { name: "Courier", sz: 24 } } },
+      { v: "bold & color", t: "s", s: { font: { bold: true, color: { rgb: "FF0000" } } } },
+      { v: "fill: color", t: "s", s: { fill: { fgColor: { rgb: "E9E9E9" } } } },
+      { v: "line\nbreak!", t: "s", s: { alignment: { wrapText: true } } },
+    ];
+
+    // STEP 3: Create Worksheet, add data, set cols widths
+    const ws = utils.aoa_to_sheet([row1, row2, row3]);
+    ws["!cols"] = [{ width: 30 }, { width: 20 }, { width: 20 }];
+    utils.book_append_sheet(wb, ws, "browser-demo");
+
+    // STEP 4: Write Excel file to browser
+    // XLSX.writeFile(wb, "xlsx-js-style-demo.xlsx");
+
+    console.log(`\n--------------------==~==~==~==[ ...DEMO COMPLETE ]==~==~==~==--------------------\n\n`);
+
     this.w = jspreadsheet(this.spreadsheet.nativeElement, {
-      url: "assets/data.json",
+      url: 'assets/data.json',
       columns: [
         { title: 'タスク名', width: 300, align: 'left' },
         { title: '担当者', width: 80 },
@@ -162,75 +221,75 @@ export class AppComponent implements OnInit, OnDestroy {
         { title: '終了日', width: 80 },
         { title: '進捗率', width: 80, type: 'text', },
       ],
-      toolbar:[
-/*
+      toolbar: [
+        /*
+                {
+                    type: 'i',
+                    content: 'undo',
+                    onclick: function() {
+                      this.w.undo();
+                    }
+                },
+                {
+                    type: 'i',
+                    content: 'redo',
+                    onclick: function() {
+                        table.redo();
+                    }
+                },
+                {
+                    type: 'i',
+                    content: 'save',
+                    onclick: function () {
+                        table.download();
+                    }
+                },
+        */
         {
-            type: 'i',
-            content: 'undo',
-            onclick: function() {
-              this.w.undo();
-            }
+          type: 'select',
+          k: 'font-family',
+          v: ['Arial', 'Verdana']
         },
         {
-            type: 'i',
-            content: 'redo',
-            onclick: function() {
-                table.redo();
-            }
+          type: 'select',
+          k: 'font-size',
+          v: ['9px', '10px', '11px', '12px', '13px', '14px', '15px', '16px', '17px', '18px', '19px', '20px']
         },
         {
-            type: 'i',
-            content: 'save',
-            onclick: function () {
-                table.download();
-            }
-        },
-*/
-        {
-            type: 'select',
-            k: 'font-family',
-            v: ['Arial','Verdana']
+          type: 'i',
+          content: 'format_align_left',
+          k: 'text-align',
+          v: 'left'
         },
         {
-            type: 'select',
-            k: 'font-size',
-            v: ['9px','10px','11px','12px','13px','14px','15px','16px','17px','18px','19px','20px']
+          type: 'i',
+          content: 'format_align_center',
+          k: 'text-align',
+          v: 'center'
         },
         {
-            type: 'i',
-            content: 'format_align_left',
-            k: 'text-align',
-            v: 'left'
+          type: 'i',
+          content: 'format_align_right',
+          k: 'text-align',
+          v: 'right'
         },
         {
-            type:'i',
-            content:'format_align_center',
-            k:'text-align',
-            v:'center'
+          type: 'i',
+          content: 'format_bold',
+          k: 'font-weight',
+          v: 'bold'
         },
         {
-            type: 'i',
-            content: 'format_align_right', 
-            k: 'text-align',
-            v: 'right'
+          type: 'color',
+          content: 'format_color_text',
+          k: 'color'
         },
         {
-            type: 'i',
-            content: 'format_bold',
-            k: 'font-weight',
-            v: 'bold'
+          type: 'color',
+          content: 'format_color_fill',
+          k: 'background-color'
         },
-        {
-            type: 'color',
-            content: 'format_color_text',
-            k: 'color'
-        },
-        {
-            type: 'color',
-            content: 'format_color_fill',
-            k: 'background-color'
-        },
-    ],
+      ],
       minDimensions: [10, 10],
       onselection: selectionActive,
     });

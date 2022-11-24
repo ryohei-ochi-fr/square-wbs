@@ -2,3 +2,16 @@
 <div #spreadsheet></div>
 <div>{{log}}</div>
 <div id="script"></div>
+
+<!-- xlsx -->
+<div class="content" role="main"><table>
+    <thead><th>Name</th><th>Index</th></thead>
+    <tbody>
+      <tr *ngFor="let row of rows">
+        <td>{{row.Name}}</td>
+        <td>{{row.Index}}</td>
+      </tr>
+    </tbody><tfoot>
+      <button (click)="onSave()">Export XLSX</button>
+    </tfoot>
+  </table></div>
